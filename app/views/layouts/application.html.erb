@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ContactList</title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="javascripts/jquery.dataTables.min.js"></script>
+    <script src="javascripts/dataTables.bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-resource.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-route.js"></script>
+    <script src="javascripts/angular-datatables.min.js"></script>
+    <script src="javascripts/app.js"></script>
+    <script src="javascripts/Controllers/contactsController.js"></script>
+    <script src="javascripts/Services/contactsService.js"></script>
+
+    <link href="stylesheets/angular-datatables.css" rel="stylesheet" />
+    <link href="stylesheets/bootstrap.min.css" rel="stylesheet" />
+    <link href="stylesheets/font-awesome.min.css" rel="stylesheet" />
+    <link href="stylesheets/site.css" rel="stylesheet" />
+    <script src="javascripts/bootstrap.js"></script>
+    <script src="javascripts/phoneMask.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+  </head>
+
+  <body ng-app="ContactsApp">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <a href="/" class="navbar-brand">
+                <%= image_tag "logo.png" %>
+            </a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="nav navbar-nav navbar-right">
+                <div class="btn-group" style="margin-top:10px;">
+                    <a href="#" class="btn btn-default dropdown-toggle menu-dropdown" data-toggle="dropdown" aria-expanded="false">My Sites <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="http://gbrethen.github.io" class="menu-img btn-outline"><i class="fa fa-fw fa-github"></i>&nbsp;&nbsp;Github</a></li>
+                        <li><a href="https://www.linkedin.com/in/themouseintechnology" class="menu-img btn-outline"><i class="fa fa-fw fa-linkedin"></i>&nbsp;&nbsp;LinkedIn</a></li>
+                        <li><a href="https://plus.google.com/114411495969980193730" class="menu-img btn-outline"><i class="fa fa-fw fa-google-plus"></i>&nbsp;&nbsp;Google+</a></li>
+                        <li><a href="https://twitter.com/gbrethen" class="menu-img btn-outline"><i class="fa fa-fw fa-twitter"></i>&nbsp;&nbsp;Twitter</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div id="main-content" class="container" ng-controller="ContactsController">
+        <div class="col-md-9 left-column">
+            <div>
+                <h3>Greg's Contacts</h3>
+                <hr />
+                <div style="width:100%;">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <table id="tblContacts" datatable="ng" class="table table-hover table-condensed table-responsive">
+                                <thead>
+                                    <tr class="header_color">
+                                        <th>&nbsp;</th>
+                                        <th class="sort">Name <i class="fa fa-sort"></i></th>
+                                        <th>Address</th>
+                                        <th>City/St</th>
+                                        <th>Zip</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="contact in contacts.data">
+                                        <td><button class="btn btn-sm btn-danger" ng-click="RemoveContact(contact.id)">Delete</button></td>
+                                        <td>{{contact.name}}</td>
+                                        <td>{{contact.address}}</td>
+                                        <td>{{contact.city}}&#44;&nbsp;{{contact.state}}</td>
+                                        <td>{{contact.zip}}</td>
+                                        <td>{{contact.email_address}}</td>
+                                        <td>{{contact.phone_number}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="right-column" class="col-md-3 right-column">
+            <div>
+                <h3>New Contact</h3>
+                <hr class="whiteBG"/>
+                <form novalidate role="form" name="contactForm" class="form-horizontal" style="padding:25px;" ng-submit="Submit()">
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input type="text" name="ContactFirstName" ng-model="contact.firstName" ng-class="IsFormSubmitted ? 'ng-dirty' : ''"
+                                   class="form-control" placeholder="First Name:" required />
+                            <span class="error"
+                                  ng-show="(contactForm.ContactFirstName.$dirty || IsFormSubmitted) && contactForm.ContactFirstName.$error.required">Contact First Name required.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input type="text" name="ContactLastName" ng-model="contact.lastName" ng-class="IsFormSubmitted ? 'ng-dirty' : ''"
+                                   class="form-control" placeholder="Last Name:" required />
+                            <span class="error"
+                                  ng-show="(contactForm.ContactLastName.$dirty || IsFormSubmitted) && contactForm.ContactLastName.$error.required">Contact Last Name required.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input type="text" name="ContactAddress" ng-model="contact.address" ng-class="IsFormSubmitted ? 'ng-dirty' : ''"
+                                   class="form-control" placeholder="Address:" required />
+                            <span class="error"
+                                  ng-show="(contactForm.ContactAddress.$dirty || IsFormSubmitted) && contactForm.ContactAddress.$error.required">Contact Address required.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-8">
+                            <input type="text" name="ContactCity" ng-model="contact.city" ng-class="IsFormSubmitted ? 'ng-dirty' : ''"
+                                   class="form-control" placeholder="City:" required />
+                            <span class="error"
+                                  ng-show="(contactForm.ContactCity.$dirty || IsFormSubmitted) && contactForm.ContactCity.$error.required">Contact City required.</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="text" name="ContactState" ng-model="contact.state" ng-class="IsFormSubmitted ? 'ng-dirty' : ''"
+                                   class="form-control" maxlength="2" placeholder="State:" required />
+                            <span class="error"
+                                  ng-show="(contactForm.ContactState.$dirty || IsFormSubmitted) && contactForm.ContactState.$error.required">State required.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-6">
+                            <input type="text" name="ContactZip" ng-model="contact.zip" ng-class="IsFormSubmitted ? 'ng-dirty' : ''"
+                                   class="form-control" maxlength="5" placeholder="Zip:" required />
+                            <span class="error"
+                                  ng-show="(contactForm.ContactZip.$dirty || IsFormSubmitted) && contactForm.ContactZip.$error.required">Zip Code required.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input type="email" name="EmailID" ng-model="contact.email_address" ng-class="IsFormSubmitted ? 'ng-dirty' : ''"
+                                   class="form-control" placeholder="Email:" required />
+                            <span class="error"
+                                  ng-show="(contactForm.EmailID.$dirty || IsFormSubmitted) && contactForm.EmailID.$error.email">Invalid email.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input type="text" name="Phone" ng-model="contact.phone_number" ng-class="IsFormSubmitted ? 'ng-dirty' : ''"
+                                   class="form-control" placeholder="Phone: (###) ###-###" />
+                            <span class="error"
+                                  ng-show="(contactForm.Phone.$dirty || IsFormSubmitted) && contactForm.Phone.$error.email">Invalid phone number.</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer class="container text-center">
+        <p>&copy; 2017 GBB Creations</p>
+    </footer>
+</body>
+</html>
